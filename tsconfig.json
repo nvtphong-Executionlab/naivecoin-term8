@@ -2,9 +2,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "ES2015",
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true
   },
-  "include": [
+  "files": [
     "src/main.ts",
     "src/block.ts",
     "src/p2p.ts",
