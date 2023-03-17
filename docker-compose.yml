@@ -1,11 +1,13 @@
 version: '2'
 services:
   node1:
-    image: naivecoin
+    build:
+      context: ./
     ports:
     - "3001:3001"
   node2:
-    image: naivecoin
+    build:
+      context: ./
     environment:
       - PEERS=ws://node1:6001
     ports:
@@ -13,7 +15,8 @@ services:
     networks:
     - coin
   node3:
-    image: naivecoin
+    build:
+      context: ./
     environment:
       - PEERS=ws://node2:6001
     ports:

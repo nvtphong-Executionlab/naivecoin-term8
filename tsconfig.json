@@ -7,7 +7,7 @@
   },
   "files": [
     "src/main.ts",
-    "src/block.ts",
+    "src/blockchain.ts",
     "src/p2p.ts",
     "src/util.ts",
     "src/transaction.ts",
