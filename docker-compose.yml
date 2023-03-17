@@ -3,13 +3,17 @@ services:
   node1:
     build:
       context: ./
+    environment:
+      - PEERS=ws://naivecoin-node2-1:6001
     ports:
     - "3001:3001"
+    networks:
+    - coin
   node2:
     build:
       context: ./
     environment:
-      - PEERS=ws://node1:6001
+      - PEERS=ws://naivecoin-node3-1:6001
     ports:
     - "3002:3001"
     networks:
@@ -17,8 +21,6 @@ services:
   node3:
     build:
       context: ./
-    environment:
-      - PEERS=ws://node2:6001
     ports:
     - "3003:3001"
     networks:

@@ -7,7 +7,7 @@ import {
 } from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
 import {UnspentTxOut} from './transaction';
-import {getTransactionPool} from './transactionPool';
+import {getTransactionPool, clearTransactionPool} from './transactionPool';
 import {getPublicFromWallet, initWallet} from './wallet';
 
 const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
@@ -68,7 +68,8 @@ const initHttpServer = (myHttpPort: number) => {
     });
 
     app.post('/mineBlock', (req, res) => {
-        const newBlock: Block = generateNextBlock();
+        const malicious = req.body.malicious || false;
+        const newBlock: Block = generateNextBlock(malicious);
         if (newBlock === null) {
             res.status(400).send('could not generate block');
         } else {
@@ -102,11 +103,12 @@ const initHttpServer = (myHttpPort: number) => {
         try {
             const address = req.body.address;
             const amount = req.body.amount;
+            const malicious = req.body.malicious || false;
 
             if (address === undefined || amount === undefined) {
                 throw Error('invalid address or amount');
             }
-            const resp = sendTransaction(address, amount);
+            const resp = sendTransaction(address, amount, malicious);
             res.send(resp);
         } catch (e) {
             console.log(e.message);
@@ -123,6 +125,11 @@ const initHttpServer = (myHttpPort: number) => {
     });
     app.post('/addPeer', (req, res) => {
         connectToPeers(req.body.peer);
+        res.send();
+    });
+
+    app.post('/clearTransactionPool', (req, res) => {
+        clearTransactionPool();
         res.send();
     });
 
