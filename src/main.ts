@@ -3,12 +3,12 @@ import * as express from 'express';
 import * as _ from 'lodash';
 import {
     Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
-    getBlockchain, getMyUnspentTransactionOutputs, getUnspentTxOuts, sendTransaction
+    getBlockchain, getMyUnspentTransactionOutputs, getTransactionHistory, getUnspentTxOuts, sendTransaction
 } from './blockchain';
-import {connectToPeers, getSockets, initP2PServer} from './p2p';
-import {UnspentTxOut} from './transaction';
-import {getTransactionPool, clearTransactionPool} from './transactionPool';
-import {getPublicFromWallet, initWallet} from './wallet';
+import { connectToPeers, getSockets, initP2PServer } from './p2p';
+import { UnspentTxOut } from './transaction';
+import { getTransactionPool, clearTransactionPool } from './transactionPool';
+import { getPublicFromWallet, initWallet } from './wallet';
 
 const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
 const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
@@ -28,7 +28,7 @@ const initHttpServer = (myHttpPort: number) => {
     });
 
     app.get('/block/:hash', (req, res) => {
-        const block = _.find(getBlockchain(), {'hash' : req.params.hash});
+        const block = _.find(getBlockchain(), { 'hash': req.params.hash });
         res.send(block);
     });
 
@@ -36,19 +36,23 @@ const initHttpServer = (myHttpPort: number) => {
         const tx = _(getBlockchain())
             .map((blocks) => blocks.data)
             .flatten()
-            .find({'id': req.params.id});
+            .find({ 'id': req.params.id });
         res.send(tx);
     });
 
     app.get('/address/:address', (req, res) => {
         const unspentTxOuts: UnspentTxOut[] =
             _.filter(getUnspentTxOuts(), (uTxO) => uTxO.address === req.params.address);
-        res.send({'unspentTxOuts': unspentTxOuts});
+        res.send({ 'unspentTxOuts': unspentTxOuts });
     });
 
     app.get('/unspentTransactionOutputs', (req, res) => {
         res.send(getUnspentTxOuts());
     });
+
+    app.get('/history', (req, res) => {
+        res.send(getTransactionHistory());
+    })
 
     app.get('/myUnspentTransactionOutputs', (req, res) => {
         res.send(getMyUnspentTransactionOutputs());
@@ -79,12 +83,12 @@ const initHttpServer = (myHttpPort: number) => {
 
     app.get('/balance', (req, res) => {
         const balance: number = getAccountBalance();
-        res.send({'balance': balance});
+        res.send({ 'balance': balance });
     });
 
     app.get('/address', (req, res) => {
         const address: string = getPublicFromWallet();
-        res.send({'address': address});
+        res.send({ 'address': address });
     });
 
     app.post('/mineTransaction', (req, res) => {
@@ -134,7 +138,7 @@ const initHttpServer = (myHttpPort: number) => {
     });
 
     app.post('/stop', (req, res) => {
-        res.send({'msg' : 'stopping server'});
+        res.send({ 'msg': 'stopping server' });
         process.exit();
     });
 
